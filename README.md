@@ -1,4 +1,5 @@
 # snek-rs
+![snek-demo](https://github.com/user-attachments/assets/3a8bb5b7-4b15-4edf-9019-63d4d5961b5b)
 
 A terminal Snake game with networked multiplayer support, built in Rust.
 
