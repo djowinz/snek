@@ -1,10 +1,18 @@
-[package]
-name = "snek-rs"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "3"
+members = [
+    "crates/snek-shared",
+    "crates/snek-relay",
+    "crates/snek-client",
+]
 
-[dependencies]
-ratatui = "0.30.0"
-crossterm = "0.29.0"
-color-eyre = "0.6.5"
+[workspace.dependencies]
+snek-shared = { path = "crates/snek-shared" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = "0.26"
+futures-util = "0.3"
+uuid = { version = "1", features = ["v4", "serde"] }
 rand = "0.10.0"
+color-eyre = "0.6.5"

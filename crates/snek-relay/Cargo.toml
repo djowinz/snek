@@ -1,0 +1,13 @@
+[package]
+name = "snek-relay"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+snek-shared = { workspace = true }
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }
+color-eyre = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }

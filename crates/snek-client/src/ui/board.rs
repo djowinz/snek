@@ -7,7 +7,7 @@ use ratatui::{
     widgets::{Block, Widget},
 };
 
-use crate::game::GameState;
+use crate::game::single_player::GameState;
 
 impl Widget for &GameState {
     fn render(self, area: Rect, buf: &mut Buffer) {
@@ -31,16 +31,20 @@ impl Widget for &GameState {
 
         let playarea: Rect = block.inner(area);
 
-        // Render the food
-        let food_cell = &mut buf[(playarea.x + self.food.x, playarea.y + self.food.y)];
-        food_cell.set_char('#');
-        food_cell.set_style(Style::default().fg(ratatui::style::Color::Green));
+        // Render the food (with bounds check to prevent panic on resize)
+        if self.food.x < playarea.width && self.food.y < playarea.height {
+            let food_cell = &mut buf[(playarea.x + self.food.x, playarea.y + self.food.y)];
+            food_cell.set_char('#');
+            food_cell.set_style(Style::default().fg(ratatui::style::Color::Green));
+        }
 
         // Render the body of the snek using block elements
         for vec in self.snake.body.iter() {
-            let body_cell = &mut buf[(playarea.x + vec.x, playarea.y + vec.y)];
-            body_cell.set_char('█');
-            body_cell.set_style(Style::default().fg(ratatui::style::Color::Blue));
+            if vec.x < playarea.width && vec.y < playarea.height {
+                let body_cell = &mut buf[(playarea.x + vec.x, playarea.y + vec.y)];
+                body_cell.set_char('█');
+                body_cell.set_style(Style::default().fg(ratatui::style::Color::Blue));
+            }
         }
 
         block.render(area, buf);

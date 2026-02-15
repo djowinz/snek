@@ -1,0 +1,16 @@
+[package]
+name = "snek-client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+snek-shared = { workspace = true }
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }
+ratatui = "0.30.0"
+crossterm = "0.29.0"
+rand = { workspace = true }
+color-eyre = { workspace = true }
+uuid = { workspace = true }
+serde_json = { workspace = true }
