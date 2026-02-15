@@ -7,6 +7,7 @@ pub struct Snake {
     pub direction: KeyDirection,
     pub alive: bool,
     pub score: u16,
+    pub lives: u8,
 }
 
 impl Snake {
@@ -30,6 +31,7 @@ impl Snake {
             direction: KeyDirection::Right,
             alive: true,
             score: 0,
+            lives: 0,
         }
     }
 
@@ -53,7 +55,28 @@ impl Snake {
             direction,
             alive: true,
             score: 0,
+            lives: 2,
         }
+    }
+
+    /// Reset the snake at a new position (for respawning). Keeps score, decrements lives.
+    pub fn reset_at(&mut self, x: u16, y: u16, direction: KeyDirection, length: u16) {
+        self.body.clear();
+        let (dx, dy): (i16, i16) = match direction {
+            KeyDirection::Right => (-1, 0),
+            KeyDirection::Left => (1, 0),
+            KeyDirection::Up => (0, 1),
+            KeyDirection::Down => (0, -1),
+        };
+        for i in (0..length).rev() {
+            self.body.push_front(SpacePoint {
+                x: (x as i16 + dx * i as i16) as u16,
+                y: (y as i16 + dy * i as i16) as u16,
+            });
+        }
+        self.direction = direction;
+        self.alive = true;
+        self.lives -= 1;
     }
 
     /// Advance the snake one step in its current direction, wrapping at board edges.

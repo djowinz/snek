@@ -57,7 +57,9 @@ pub enum PeerMessage {
     GameTick {
         snakes: Vec<SnakeState>,
         food: SpacePoint,
+        bombs: Vec<SpacePoint>,
         tick: u64,
+        time_remaining: u16,
     },
     GameOver {
         result: MatchResult,

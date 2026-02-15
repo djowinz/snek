@@ -7,6 +7,14 @@ pub const MP_BOARD_HEIGHT: u16 = 20;
 pub const MP_MIN_TERM_WIDTH: u16 = MP_BOARD_WIDTH + 2; // 62
 pub const MP_MIN_TERM_HEIGHT: u16 = MP_BOARD_HEIGHT + 2; // 22
 
+// Multiplayer game duration: 1200 ticks at 100ms/tick = 2 minutes
+pub const MP_GAME_DURATION_TICKS: u64 = 1200;
+
+// Bombs: spawn one every 3 seconds, max 3 on board, relocate once full
+pub const MAX_BOMBS: usize = 3;
+pub const BOMB_SPAWN_INTERVAL_TICKS: u64 = 30;
+pub const BOMB_MOVE_INTERVAL_TICKS: u64 = 30;
+
 // Security limits
 pub const MAX_NAME_LENGTH: usize = 16;
 pub const MAX_WS_MESSAGE_SIZE: usize = 65536; // 64 KB — room for large game states + PeerEnvelope wrapping
@@ -68,6 +76,7 @@ pub struct SnakeState {
     pub direction: KeyDirection,
     pub alive: bool,
     pub score: u16,
+    pub lives: u8,
 }
 
 #[derive(Clone, Copy, PartialEq, Serialize, Deserialize, Debug)]
@@ -77,6 +86,8 @@ pub enum GameOverReason {
     BodyCollision,
     OpponentDisconnected,
     OpponentDied,
+    TimeExpired,
+    BombExplosion,
 }
 
 #[derive(Clone, Copy, PartialEq, Serialize, Deserialize, Debug)]

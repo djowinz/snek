@@ -75,6 +75,8 @@ pub fn run_guest(
     // Main game loop - render state from host, send input
     let mut last_snakes: Vec<SnakeState> = Vec::new();
     let mut last_food = SpacePoint { x: 0, y: 0 };
+    let mut last_bombs: Vec<SpacePoint> = Vec::new();
+    let mut last_time_remaining: u16 = (MP_GAME_DURATION_TICKS / 10) as u16;
     let mut last_direction: Option<KeyDirection> = None;
     let mut terminal_too_small = {
         let dim = terminal.size()?;
@@ -85,12 +87,16 @@ pub fn run_guest(
         // Render latest state
         if !last_snakes.is_empty() {
             let too_small = terminal_too_small;
+            let time_remaining = last_time_remaining;
+            let bombs = &last_bombs;
             terminal.draw(|frame| {
                 let board = MultiplayerBoard {
                     snakes: &last_snakes,
                     food: last_food,
+                    bombs,
                     board_width,
                     board_height,
+                    time_remaining,
                 };
                 frame.render_widget(&board, frame.area());
                 if too_small {
@@ -147,10 +153,19 @@ pub fn run_guest(
                     ServerRelayMessage::PeerEnvelope { payload } => {
                         if let Ok(peer_msg) = serde_json::from_str::<PeerMessage>(&payload) {
                             match peer_msg {
-                                PeerMessage::GameTick { snakes, food, .. } => {
+                                PeerMessage::GameTick {
+                                    snakes,
+                                    food,
+                                    bombs,
+                                    time_remaining,
+                                    ..
+                                } => {
                                     // Validate received state before applying
                                     let valid = food.x < board_width
                                         && food.y < board_height
+                                        && bombs
+                                            .iter()
+                                            .all(|b| b.x < board_width && b.y < board_height)
                                         && snakes.iter().all(|s| {
                                             s.player.name.len() <= MAX_NAME_LENGTH
                                                 && s.body.iter().all(|p| {
@@ -160,6 +175,8 @@ pub fn run_guest(
                                     if valid {
                                         last_snakes = snakes;
                                         last_food = food;
+                                        last_bombs = bombs;
+                                        last_time_remaining = time_remaining;
                                     }
                                 }
                                 PeerMessage::GameOver {
