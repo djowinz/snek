@@ -49,7 +49,7 @@ impl Widget for &MultiplayerBoard<'_> {
         };
 
         // Build title with colored player names, scores, and lives
-        let title = Line::from(" Snek Multiplayer ".bold());
+        let title = Line::from(" Snek Game ".bold());
 
         // Timer display
         let minutes = self.time_remaining / 60;
@@ -106,7 +106,7 @@ impl Widget for &MultiplayerBoard<'_> {
             if bomb.x < playarea.width && bomb.y < playarea.height {
                 let cell = &mut buf[(playarea.x + bomb.x, playarea.y + bomb.y)];
                 cell.set_char('B');
-                cell.set_style(Style::default().fg(ratatui::style::Color::Red));
+                cell.set_style(Style::default().fg(ratatui::style::Color::Green));
             }
         }
 

@@ -281,6 +281,7 @@ pub fn run_host(
             && let Some(idx) = bombs.iter().position(|b| *b == host_head)
         {
             bombs.remove(idx);
+            host_snake.score = host_snake.score.saturating_sub(1);
             if host_snake.body.len() <= 1 {
                 // Only head left — bomb kills the snake
                 host_snake.alive = false;
@@ -294,6 +295,7 @@ pub fn run_host(
             && let Some(idx) = bombs.iter().position(|b| *b == guest_head)
         {
             bombs.remove(idx);
+            guest_snake.score = guest_snake.score.saturating_sub(1);
             if guest_snake.body.len() <= 1 {
                 guest_snake.alive = false;
                 guest_died = true;
