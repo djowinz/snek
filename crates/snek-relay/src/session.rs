@@ -52,19 +52,26 @@ pub async fn relay_session(peer_tx: &mpsc::Sender<String>, my_rx: &mut WsRx) {
     while let Some(msg_result) = my_rx.next().await {
         let msg = match msg_result {
             Ok(Message::Text(t)) => t.to_string(),
-            Ok(Message::Close(_)) => break,
+            Ok(Message::Close(_)) => {
+                eprintln!("[relay] peer sent Close frame");
+                break;
+            }
             Ok(_) => continue,
-            Err(_) => break,
+            Err(e) => {
+                eprintln!("[relay] WebSocket read error: {e}");
+                break;
+            }
         };
 
         // Rate limit check — disconnect on exceeded
         if !limiter.check() {
-            eprintln!("Rate limit exceeded, disconnecting peer");
+            eprintln!("[relay] rate limit exceeded, disconnecting peer");
             break;
         }
 
         // Validate message is a valid PeerMessage before forwarding
         if serde_json::from_str::<PeerMessage>(&msg).is_err() {
+            eprintln!("[relay] invalid PeerMessage, skipping");
             continue;
         }
 
@@ -74,6 +81,7 @@ pub async fn relay_session(peer_tx: &mpsc::Sender<String>, my_rx: &mut WsRx) {
         // Use send().await for backpressure instead of try_send() which would
         // disconnect players when the channel is momentarily full
         if peer_tx.send(envelope).await.is_err() {
+            eprintln!("[relay] peer channel closed, ending session");
             break;
         }
     }

@@ -9,9 +9,9 @@ pub const MP_MIN_TERM_HEIGHT: u16 = MP_BOARD_HEIGHT + 2; // 22
 
 // Security limits
 pub const MAX_NAME_LENGTH: usize = 16;
-pub const MAX_WS_MESSAGE_SIZE: usize = 4096; // 4 KB
-pub const MAX_WS_FRAME_SIZE: usize = 4096;
-pub const RELAY_CHANNEL_BOUND: usize = 64;
+pub const MAX_WS_MESSAGE_SIZE: usize = 65536; // 64 KB — room for large game states + PeerEnvelope wrapping
+pub const MAX_WS_FRAME_SIZE: usize = 65536;
+pub const RELAY_CHANNEL_BOUND: usize = 256;
 pub const MAX_RELAY_CONNECTIONS: usize = 100;
 
 // Rate limiting: 50 burst, refill 1 per 33ms ≈ 30 msg/sec sustained

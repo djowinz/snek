@@ -61,7 +61,8 @@ impl Lobby {
         // Writer task: forwards channel messages to WebSocket
         let write_task = tokio::spawn(async move {
             while let Some(msg) = out_rx.recv().await {
-                if ws_tx.send(Message::Text(msg.into())).await.is_err() {
+                if let Err(e) = ws_tx.send(Message::Text(msg.into())).await {
+                    eprintln!("[relay] writer task: WebSocket send error: {e}");
                     break;
                 }
             }
@@ -74,9 +75,15 @@ impl Lobby {
         while let Some(msg_result) = ws_rx.next().await {
             let msg = match msg_result {
                 Ok(Message::Text(t)) => t.to_string(),
-                Ok(Message::Close(_)) => break,
+                Ok(Message::Close(_)) => {
+                    eprintln!("[lobby] client {peer_addr} sent Close frame");
+                    break;
+                }
                 Ok(_) => continue,
-                Err(_) => break,
+                Err(e) => {
+                    eprintln!("[lobby] WebSocket read error from {peer_addr}: {e}");
+                    break;
+                }
             };
 
             let Ok(relay_msg) = serde_json::from_str::<ClientRelayMessage>(&msg) else {
